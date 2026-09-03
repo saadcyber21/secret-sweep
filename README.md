@@ -1,6 +1,3 @@
-Here is the complete, formatted `README.md` for your **Secrets-Sweep** project. You can copy the entire code block below directly into your file.
-
-```markdown
 # 🛡️ Secrets-Sweep: Zero-Dependency Secret & Entropy Scanner
 
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
