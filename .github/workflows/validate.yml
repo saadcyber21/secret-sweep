@@ -1,0 +1,24 @@
+name: Secrets-Sweep Validation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Run Secrets-Sweep Scanner
+        run: |
+          echo "Scanning sample_secrets.txt (Expected to FAIL and catch secrets)..."
+          python scanner.py sample_secrets.txt || echo "Scanner correctly identified leaked secrets!"
