@@ -1,24 +1,67 @@
-name: Secrets-Sweep Validation
+name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
-  security-scan:
+  test:
+    name: tests (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Unit + integration tests
+        run: python tests/run_tests.py
+
+      # The two gates below are the reason this workflow exists. A secret
+      # scanner whose detector silently stops detecting still passes its unit
+      # tests if they only cover the happy path, so the fixtures are asserted
+      # from both directions. The dirty tree is generated rather than committed:
+      # see fixtures/README.md.
+      - name: Gate - clean fixture must produce zero findings
+        run: python scanner.py fixtures/clean --no-color --allowlist /dev/null
+
+      - name: Gate - generated dirty fixture must be detected and fail the build
+        run: |
+          dirty=$(python scripts/make_dirty_fixture.py)
+          set +e
+          python scanner.py "$dirty" --no-color --allowlist /dev/null
+          code=$?
+          set -e
+          if [ "$code" -ne 1 ]; then
+            echo "::error::dirty fixture exited $code, expected 1 - the detector is not detecting"
+            exit 1
+          fi
+          echo "dirty fixture correctly failed the build (exit 1)"
+
+      - name: Gate - detector recall has not regressed
+        run: python scripts/check_recall.py
+
+  self-scan:
+    name: scan this repository
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.12"
 
-      - name: Run Secrets-Sweep Scanner
+      # Scans the tool's own source, excluding the fixtures that exist to be
+      # detected. Dogfooding: if the scanner cannot scan itself cleanly it is
+      # not ready to be pointed at anyone else's tree.
+      - name: Run secret-sweep on its own source
         run: |
-          echo "Scanning sample_secrets.txt (Expected to FAIL and catch secrets)..."
-          python scanner.py sample_secrets.txt || echo "Scanner correctly identified leaked secrets!"
+          python scanner.py scanner.py --no-color
+          python scanner.py scripts --no-color
+          python scanner.py tests/run_tests.py --no-color

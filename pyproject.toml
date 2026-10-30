@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "secret-sweep"
+version = "2.0.0"
+description = "Zero-dependency secret scanner: prefixed-credential patterns plus a calibrated entropy detector with published false-positive rates."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "saadcyber21" }]
+keywords = ["security", "secrets", "scanner", "entropy", "ci", "devsecops"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Security",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+
+[project.scripts]
+secret-sweep = "scanner:main"
+
+[project.urls]
+Homepage = "https://github.com/saadcyber21/secret-sweep"
+Issues = "https://github.com/saadcyber21/secret-sweep/issues"
+
+[tool.setuptools]
+py-modules = ["scanner"]
