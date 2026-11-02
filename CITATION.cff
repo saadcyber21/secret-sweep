@@ -1,0 +1,20 @@
+# CITATION.cff — makes the tool formally citable (GitHub shows a "Cite" button;
+# Zenodo ingests this on archive). Enable Zenodo: zenodo.org → GitHub → flip the
+# switch for saadcyber21/secret-sweep, then tag a release to mint a DOI.
+cff-version: 1.2.0
+message: "If you use secret-sweep in research or a published pipeline, please cite it as below."
+title: "secret-sweep: zero-dependency credential detection with a measured error rate"
+authors:
+  - family-names: Saad
+    given-names: MD
+    alias: saadcyber21
+version: 2.0.0
+date-released: "2026-11-03"
+license: MIT
+repository-code: "https://github.com/saadcyber21/secret-sweep"
+keywords:
+  - secret-detection
+  - shannon-entropy
+  - static-analysis
+  - ci
+  - zero-dependency
